@@ -56,4 +56,4 @@ class Interview(models.Model):
     ], default='PH')
 
     def __str__(self):
-        return f"Interview for {self.application.job.title} with {self.interviewer} on {self.interview_date}"
+        return f"Interview for {self.application.job.title} with {self.interviewer_name} on {self.interview_date}"
