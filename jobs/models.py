@@ -36,7 +36,7 @@ class Application(models.Model):
         ('IN', 'Interview'),
         ('OF', 'Offer'),
         ('RE', 'Rejection'),
-    ], default='AP')
+    ], default='DR')
 
     def __str__(self):
         return f"{self.job.title} at {self.job.company_name} - {self.applicant.username}"
