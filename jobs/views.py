@@ -24,6 +24,9 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if self.request.user.profile.account_type == Profile.ACCOUNT_EMPLOYER:
+            # Employers can see applications for their job postings
+            return Application.objects.filter(job__company=self.request.user.profile.company)
         return Application.objects.filter(applicant=self.request.user)
 
     def perform_create(self, serializer):
