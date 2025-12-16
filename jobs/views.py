@@ -25,8 +25,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.profile.account_type == Profile.ACCOUNT_EMPLOYER:
-            # Employers can see applications for their job postings
-            return Application.objects.filter(job__company=self.request.user.profile.company)
+            # Employers can see all submitted applications for their company's job postings
+            return Application.objects.filter(job__company=self.request.user.profile.company, status__in=["AP", "IN"])
         return Application.objects.filter(applicant=self.request.user)
 
     def perform_create(self, serializer):
