@@ -68,6 +68,29 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             {"id": application.id, "status": application.status},
             status=http_status.HTTP_200_OK
         )
+    
+    @action(detail=True, methods=["put"]) # Custom action to withdraw an application
+    def withdraw(self, request, pk=None):
+        application = self.get_object()
+
+        # explicit application ownership check
+        if application.applicant != request.user:
+            raise PermissionDenied("You do not have permission to withdraw this application.")
+
+        # only allow withdraw if applied
+        if application.status != "AP":
+            return Response(
+                {"detail": "Only submitted applications can be withdrawn."},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        application.status = "DR" # revert back to draft
+        application.save(update_fields=["status"]) # only update status field
+
+        return Response(
+            {"id": application.id, "status": application.status},
+            status=http_status.HTTP_200_OK
+        )
 
 
 # Ownership checks are commented out for now to facilitate testing, add back after creating employer user type
