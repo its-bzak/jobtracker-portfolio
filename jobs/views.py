@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from django.db.models import Q
-from .models import JobPosting, Application, Interview
+from .models import Profile, Company, JobPosting, Application, Interview
 from .serializers import (JobPostingSerializer, ApplicationSerializer, InterviewSerializer)
 
 # Create your views here.

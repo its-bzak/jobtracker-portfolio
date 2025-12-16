@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -15,7 +16,16 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     account_type = models.CharField(max_length=2, choices=ACCOUNT_TYPES, default=ACCOUNT_APPLICANT)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+    company = models.ForeignKey('Company', on_delete=models.SET_NULL, blank=True, null=True)
+
+    def clean(self):
+        super().clean()
+        if self.account_type == self.ACCOUNT_APPLICANT and self.company is not None:
+            raise ValidationError({ # Raise validation error if an applicant profile is linked to a company
+                "company": "Applicants cannot be associated with a company."
+            })
+        # If the profile is an employer, a company association is not mandatory, so no need to validate that case.
+
 
     def __str__(self):
         return f"{self.user.username} - {self.account_type}"
