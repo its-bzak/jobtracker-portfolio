@@ -99,10 +99,7 @@ class InterviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        return Interview.objects.filter(
-            Q(application__applicant=user)
-        ).distinct()
+        return Interview.objects.filter(application__applicant=self.request.user)
 
     def perform_create(self, serializer):
         application = serializer.validated_data.get("application")
