@@ -140,7 +140,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             {"id": application.id, "status": application.status},
             status=http_status.HTTP_200_OK
         )
-
+    
+    
 
 # Ownership checks are commented out for now to facilitate testing, add back after creating employer user type
 class InterviewViewSet(viewsets.ModelViewSet):
@@ -155,10 +156,9 @@ class InterviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         application = serializer.validated_data.get("application")
 
-        """ ADD OWNERSHIP CHECK BACK LATER
-        if application.applicant != self.request.user:
-            raise PermissionDenied("You do not have permission to add an interview for this application.")
-        """
+        if application.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
+            raise PermissionDenied("You do not have permission to create an interview for this application.")
+
         if application.status != "AP":
             raise PermissionDenied("You can only add an interview for an application that has been submitted.")
         application.status = "IN"
@@ -166,23 +166,21 @@ class InterviewViewSet(viewsets.ModelViewSet):
         serializer.save()
 
     def perform_update(self, serializer):
-        interview = self.get_object()
+        application = serializer.validated_data.get("application")
 
-        """ ADD OWNERSHIP CHECK BACK LATER
-        if interview.application.applicant != self.request.user:
-            raise PermissionDenied("You do not have permission to edit this interview.")
-        """
-        if interview.application.status != "IN":
+        if application.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
+            raise PermissionDenied("You do not have permission to update this interview.")
+        
+        if application.status != "IN":
             raise PermissionDenied("You can only update an interview for an application that is in interview stage.")
         serializer.save()
 
     def perform_destroy(self, instance):
-
-        """ ADD OWNERSHIP CHECK BACK LATER
-        if instance.application.applicant != self.request.user:
-            raise PermissionDenied("You do not have permission to delete this interview.")
-        """
         application = instance.application
+
+        if application.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
+            raise PermissionDenied("You do not have permission to delete this interview.")
+
         instance.delete()
         # If no more interviews exist for this application, revert status back to AP
         if not Interview.objects.filter(application=application).exists():
