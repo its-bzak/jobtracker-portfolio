@@ -38,3 +38,22 @@ class InterviewSerializer(serializers.ModelSerializer):
         model = Interview
         fields = ['id', 'application', 'interview_date', 'interviewer_name', 'notes', 'means_of_interview']
         read_only_fields = ['id']
+
+    def allowCreateOnlyForAuthorizedUsers(self, application, user):
+        if application.job.company != user.profile.company: # Only employers associated with the job's company can create interviews
+            raise serializers.ValidationError("You do not have permission to create an interview for this application.")
+    def validate(self, data): # Ensure only one interview per application
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        application = data.get("application") or getattr(self.instance, "application", None)
+
+        if self.instance is None: # Creation
+            if Interview.objects.filter(application=application).exists():
+                raise serializers.ValidationError("An interview for this application already exists.")
+            self.allowCreateOnlyForAuthorizedUsers(application, user)
+        else: # Update
+            if application != self.instance.application:
+                raise serializers.ValidationError("You cannot change the application of an existing interview.")
+
+        return data

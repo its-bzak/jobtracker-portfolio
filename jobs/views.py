@@ -102,6 +102,8 @@ class InterviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if self.request.user.profile.account_type == Profile.ACCOUNT_EMPLOYER:
+            return Interview.objects.filter(application__job__company=self.request.user.profile.company)
         return Interview.objects.filter(application__applicant=self.request.user)
 
     def perform_create(self, serializer):
