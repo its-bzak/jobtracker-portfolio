@@ -33,6 +33,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         application = self.get_object()
         if application.applicant != self.request.user:
             raise PermissionDenied("You do not have permission to edit this application.")
+        if application.status != "DR":
+            raise PermissionDenied("You can only edit draft applications.")
         serializer.save()
 
     def perform_destroy(self, instance):
