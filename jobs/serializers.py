@@ -14,13 +14,21 @@ class ApplicationSerializer(serializers.ModelSerializer):
         fields = ['id', 'applicant', 'job', 'application_date', 'status']
 
     def validate(self, data):
-        
-        # Check that the applicant has not already applied for the same job.
-        
-        applicant = self.context['request'].user
-        job = data.get('job')
-        if Application.objects.filter(applicant=applicant, job=job).exists():
-            raise serializers.ValidationError("You have already applied for this job.")
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        job = data.get("job") or getattr(self.instance, "job", None)
+        applicant = data.get("applicant") or getattr(self.instance, "applicant", None) or user
+
+        applicant = user
+
+        qs = Application.objects.filter(applicant=applicant, job=job)
+
+        if self.instance is not None:
+            qs = qs.exclude(pk=self.instance.pk) # Exclude the current instance when updating
+            if qs.exists():
+                raise serializers.ValidationError("You have already applied for this job.")
+
         return data
     
 class InterviewSerializer(serializers.ModelSerializer):
