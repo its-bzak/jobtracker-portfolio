@@ -42,7 +42,7 @@ class JobPosting(models.Model):
     title = models.CharField(max_length=100)
     company = models.ForeignKey(Company, on_delete=models.CASCADE) # Each job posting is linked to a company
     location = models.CharField(max_length=100)
-    employment_means = models.CharField(max_length=50 , choices=[
+    employment_means = models.CharField(max_length=2, choices=[
         ('RE', 'Remote'),
         ('ON', 'On-site'),
         ('HY', 'Hybrid'),
@@ -51,7 +51,7 @@ class JobPosting(models.Model):
     description = models.TextField(max_length=1000)
     posted_date = models.DateField(auto_now_add=True)
 
-    employment_type = models.CharField(max_length=50, choices=[
+    employment_type = models.CharField(max_length=2, choices=[
         ('FT', 'Full-time'),
         ('PT', 'Part-time'),
         ('CT', 'Contract'),
@@ -65,13 +65,28 @@ class Application(models.Model):
     applicant = models.ForeignKey(User, on_delete=models.CASCADE) # Each application is linked to a profile
     job = models.ForeignKey(JobPosting, on_delete=models.CASCADE) # Each application is linked to a job posting
     application_date = models.DateField(auto_now_add=True)
-    status = models.CharField(max_length=50, choices=[
+    status = models.CharField(max_length=2, choices=[
         ('DR', 'Draft'),
         ('AP', 'Applied'),
         ('IN', 'Interview'),
         ('OF', 'Offer'),
         ('RE', 'Rejection'),
     ], default='DR')
+
+    DR = 'DR' ; AP = 'AP' ; IN = 'IN' ; OF = 'OF' ; RE = 'RE'
+    ACCEPTED_STATUSES = {
+        DR: {AP},
+        AP: {DR, IN, OF, RE},
+        IN: {OF, RE},
+        OF: set(),
+        RE: set(),
+    }
+
+    def transition_status(self, new_status):
+        if new_status not in self.ACCEPTED_STATUSES[self.status]:
+            raise ValidationError(f"Cannot transition from status {self.status} to status {new_status}.")
+        self.status = new_status
+        self.save(update_fields=['status'])
 
     def __str__(self):
         return f"{self.job.title} at {self.job.company.name} - {self.applicant.username}"
@@ -84,7 +99,7 @@ class Interview(models.Model):
     interview_date = models.DateTimeField()
     interviewer_name = models.CharField(max_length=100)
     notes = models.TextField(max_length=1000, blank=True, null=True)
-    means_of_interview = models.CharField(max_length=50, choices=[
+    means_of_interview = models.CharField(max_length=2, choices=[
         ('PH', 'Phone'),
         ('VI', 'Video Call'),
         ('IN', 'In-Person'),

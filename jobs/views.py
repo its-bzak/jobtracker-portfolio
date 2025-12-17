@@ -99,51 +99,21 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             status=http_status.HTTP_200_OK
         )
     
-    @action(detail=True, methods=["put"]) # Custom action to mark application as offered
-    def offer(self, request, pk=None):
-        application = self.get_object()
-
-        # explicit application ownership check
-        if application.job.company != request.user.profile.company:
-            raise PermissionDenied("You do not have permission to offer this application.")
-
-        # only allow offer if in interview stage or already applied
-        if application.status not in ["IN", "AP"]:
-            return Response(
-                {"detail": "Must have applied or been interviewed before granting an offer."},
-                status=http_status.HTTP_400_BAD_REQUEST
-            )
-
-        application.status = "OF" # mark as offered
-        application.save(update_fields=["status"]) # only update status field
-
-        return Response(
-            {"id": application.id, "status": application.status},
-            status=http_status.HTTP_200_OK
-        )
+    @action(detail=True, methods=["post"])
+    def offer(self, request, pk=None):  
+        app = self.get_object()
+        if app.job.company != request.user.profile.company or request.user.profile.company is None:
+            raise PermissionDenied("No permission.")
+        app.transition_status(Application.OF)
+        return Response({"id": app.id, "status": app.status})
     
-    @action(detail=True, methods=["put"]) # Custom action to mark application as rejected
+    @action(detail=True, methods=["post"])
     def reject(self, request, pk=None):
-        application = self.get_object()
-
-        # explicit application ownership check
-        if application.job.company != request.user.profile.company:
-            raise PermissionDenied("You do not have permission to reject this application.")
-
-        # only allow reject if in interview stage or already applied
-        if application.status not in ["IN", "AP"]:
-            return Response(
-                {"detail": "Must have applied or been interviewed before rejection."},
-                status=http_status.HTTP_400_BAD_REQUEST
-            )
-
-        application.status = "RE" # mark as rejected
-        application.save(update_fields=["status"]) # only update status field
-
-        return Response(
-            {"id": application.id, "status": application.status},
-            status=http_status.HTTP_200_OK
-        )
+        app = self.get_object()
+        if app.job.company != request.user.profile.company or request.user.profile.company is None:
+            raise PermissionDenied("No permission.")
+        app.transition_status(Application.RE)
+        return Response({"id": app.id, "status": app.status})
     
     
 
@@ -192,3 +162,21 @@ class InterviewViewSet(viewsets.ModelViewSet):
         if not Interview.objects.filter(application=application).exists():
             application.status = "AP"
             application.save(update_fields=["status"])
+
+    @action(detail=True, methods=["post"])
+    def offer(self, request, pk=None):
+        interview = self.get_object()
+        app = interview.application
+        if app.job.company != request.user.profile.company or request.user.profile.company is None:
+            raise PermissionDenied("No permission.")
+        app.transition_status(Application.OF)
+        return Response({"application_id": app.id, "status": app.status})
+    
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        interview = self.get_object()
+        app = interview.application
+        if app.job.company != request.user.profile.company or request.user.profile.company is None:
+            raise PermissionDenied("No permission.")
+        app.transition_status(Application.RE)
+        return Response({"application_id": app.id, "status": app.status})
