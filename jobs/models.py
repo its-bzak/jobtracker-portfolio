@@ -80,7 +80,7 @@ class Application(models.Model):
         unique_together = ('applicant', 'job')  # Prevent duplicate applications for the same job by the same user
 
 class Interview(models.Model):
-    application = models.ForeignKey(Application, on_delete=models.CASCADE) # Each interview is linked to an application
+    application = models.OneToOneField(Application, on_delete=models.CASCADE) # Each interview is linked to an application
     interview_date = models.DateTimeField()
     interviewer_name = models.CharField(max_length=100)
     notes = models.TextField(max_length=1000, blank=True, null=True)

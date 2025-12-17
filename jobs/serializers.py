@@ -12,21 +12,24 @@ class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         fields = ['id', 'applicant', 'job', 'application_date', 'status']
-        read_only_fields = ['id', 'applicant', 'job', 'application_date', 'status']
+        read_only_fields = ['id', 'applicant', 'application_date', 'status']
 
     def validate(self, data):
         request = self.context.get("request")
         user = getattr(request, "user", None)
 
-        job = data.get("job") or getattr(self.instance, "job", None)
-        applicant = user
+        # Only drafts can be edited
+        if self.instance and self.instance.status != "DR":
+            raise serializers.ValidationError("You can only edit applications that are in Draft status.")
 
-        qs = Application.objects.filter(applicant=applicant, job=job)
+        job = data.get("job") or getattr(self.instance, "job", None) # Get job from data or instance
+        if job is None:
+            raise serializers.ValidationError({"job": "Job is required to create an application."})
 
-        if self.instance is not None:
-            qs = qs.exclude(pk=self.instance.pk) # Exclude the current instance when updating
-        if qs.exists():
-            raise serializers.ValidationError("You have already applied for this job.")
+        # Prevent duplicate applications on creation
+        if self.instance is None:
+            if Application.objects.filter(applicant=user, job=job).exists():
+                raise serializers.ValidationError("You have already applied for this job.")
 
         return data
     

@@ -7,6 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from django.db.models import Q
 from .models import Profile, Company, JobPosting, Application, Interview
 from .serializers import (JobPostingSerializer, ApplicationSerializer, InterviewSerializer)
+from django.db import transaction
 
 # Create your views here.
 
@@ -16,7 +17,10 @@ class JobPostingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(company=self.request.user)
+        profile = self.request.user.profile
+        if profile.account_type != Profile.ACCOUNT_EMPLOYER or profile.company is None:
+            raise PermissionDenied("Only employers with a company can create job postings.")
+        serializer.save(company=profile.company)
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -153,6 +157,7 @@ class InterviewViewSet(viewsets.ModelViewSet):
             return Interview.objects.filter(application__job__company=self.request.user.profile.company)
         return Interview.objects.filter(application__applicant=self.request.user)
 
+    @transaction.atomic
     def perform_create(self, serializer):
         application = serializer.validated_data.get("application")
 
@@ -166,7 +171,7 @@ class InterviewViewSet(viewsets.ModelViewSet):
         serializer.save()
 
     def perform_update(self, serializer):
-        application = serializer.validated_data.get("application")
+        application = serializer.instance.application
 
         if application.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
             raise PermissionDenied("You do not have permission to update this interview.")
@@ -175,6 +180,7 @@ class InterviewViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("You can only update an interview for an application that is in interview stage.")
         serializer.save()
 
+    @transaction.atomic
     def perform_destroy(self, instance):
         application = instance.application
 
