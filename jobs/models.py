@@ -60,6 +60,10 @@ class JobPosting(models.Model):
 
     def __str__(self):
         return f"{self.title} at {self.company.name}"
+    class Meta:
+        ordering = ['-posted_date']  # Order job postings by the date they were posted, most recent first
+
+    
 
 class Application(models.Model):
     applicant = models.ForeignKey(User, on_delete=models.CASCADE) # Each application is linked to a profile
