@@ -146,3 +146,16 @@ class JobAppAnswer(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['application', 'question'], name='unique_answer_per_question')
         ]
+    
+    def clean(self):
+        super().clean()
+
+        if self.application_id and self.question_id:
+            if self.application.job_id != self.question.job_id:
+                raise ValidationError({
+                    "question": "This cannot answer a question that is not for this job."
+                })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)

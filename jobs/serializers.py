@@ -91,3 +91,41 @@ class JobAppQuestionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Only employers can create application questions for their company.")
         return data # Return created question for given job
 
+class JobAppAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobAppAnswer
+        fields=['id', 'application', 'question', 'answer_value']
+        read_only_fields=['id']
+        
+    def validate(self, data):
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+
+        if self.instance:
+            application = self.instance.application
+            question = self.instance.question
+
+            if 'application' in data and data['application'] != application:
+                raise serializers.ValidationError({"application": 'Cannot change application of an existing answer.'})
+            if 'question' in data and data['question'] != question:
+                raise serializers.ValidationError({'question': 'Cannot change question of an existing answer.'})
+            
+        else:
+            application = data.get('application')
+            question = data.get('question')
+            if application is None:
+                raise serializers.ValidationError({'application': 'Application is required.'})
+            if question is None:
+                raise serializers.ValidationError({'question': 'Question is required.'})
+            
+        if user is None or application.applicant != user:
+            raise serializers.ValidationError('You do not have permission to answer questions for this application.')
+
+        if application.status != Application.DR:
+            raise serializers.ValidationError('You can only edit answers while the application is a draft.')
+
+        if question.job_id != application.job_id:
+            raise serializers.ValidationError({'question': 'This question does not belong to the correct job posting.'})
+        
+        return data
+    
