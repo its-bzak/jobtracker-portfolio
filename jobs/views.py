@@ -196,5 +196,60 @@ class InterviewViewSet(viewsets.ModelViewSet):
             return Response({"detail": e.messages}, status=http_status.HTTP_400_BAD_REQUEST)
         return Response({"id": app.id, "status": app.status})
 
-# To Do: Create JobAppQuestion Viewset
-# To Do: Create JobAppAnswer Viewset
+class JobAppQuestionViewSet(viewsets.ModelViewSet):
+    queryset = JobAppQuestion.objects.all()
+    serializer_class = JobAppQuestionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.profile.account_type == Profile.ACCOUNT_EMPLOYER:
+            return JobAppQuestion.objects.filter(job__company=self.request.user.profile.company)
+        return JobAppQuestion.objects.none()  # Applicants cannot view questions directly
+
+    def perform_create(self, serializer):
+        job = serializer.validated_data["job"]
+        if job.company != self.request.user.profile.company or self.request.user.profile.company is None:
+            raise PermissionDenied("You do not have permission to add questions to this job posting.")
+        serializer.save()
+
+    def perform_update(self, serializer):
+        question = self.get_object()
+        if question.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
+            raise PermissionDenied("You do not have permission to update this question.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
+            raise PermissionDenied("You do not have permission to delete this question.")
+        instance.delete()
+
+
+class JobAppAnswerViewSet(viewsets.ModelViewSet):
+    serializer_class = JobAppAnswerSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return JobAppAnswer.objects.filter(application__applicant=self.request.user)
+
+    def perform_create(self, serializer):
+        application = serializer.validated_data["application"]
+        question = serializer.validated_data["question"]
+
+        if application.applicant != self.request.user:
+            raise PermissionDenied("You do not have permission to answer questions for this application.")
+
+        if question.job != application.job:
+            raise ValidationError("This question does not belong to the job posting for this application.")
+
+        serializer.save()
+
+    def perform_update(self, serializer):
+        answer = self.get_object()
+        if answer.application.applicant != self.request.user:
+            raise PermissionDenied("You do not have permission to update this answer.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.application.applicant != self.request.user:
+            raise PermissionDenied("You do not have permission to delete this answer.")
+        instance.delete()
