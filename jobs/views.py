@@ -10,8 +10,22 @@ from .models import Profile, JobPosting, Application, Interview, JobAppQuestion,
 from .serializers import (JobPostingSerializer, ApplicationSerializer, InterviewSerializer, 
                           JobAppAnswerSerializer, JobAppQuestionSerializer)
 from django.db import transaction
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=http_status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=http_status.HTTP_400_BAD_REQUEST)
 
 class JobPostingViewSet(viewsets.ModelViewSet):
     queryset = JobPosting.objects.all()
