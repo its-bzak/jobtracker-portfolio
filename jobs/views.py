@@ -1,5 +1,6 @@
 from urllib import request
 from rest_framework import viewsets
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status as http_status
 from rest_framework.decorators import action
@@ -8,12 +9,22 @@ from rest_framework.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from .models import Profile, JobPosting, Application, Interview, JobAppQuestion, JobAppAnswer
 from .serializers import (JobPostingSerializer, ApplicationSerializer, InterviewSerializer, 
-                          JobAppAnswerSerializer, JobAppQuestionSerializer)
+                          JobAppAnswerSerializer, JobAppQuestionSerializer, RegisterSerializer)
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
+
+class RegisterView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "User registered successfully."}, status=http_status.HTTP_201_CREATED)
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
