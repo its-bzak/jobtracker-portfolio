@@ -27,7 +27,7 @@ async function refreshAccessToken(): Promise<string> {
   if (!refresh) throw new Error("No refresh token");
 
   const resp = await axios.post(
-    `${API_BASE_URL}/api/token/refresh/`,
+    `${API_BASE_URL}/api/auth/refresh/`,
     { refresh },
     { headers: { "Content-Type": "application/json" } }
   );

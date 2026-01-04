@@ -2,7 +2,7 @@ import { api } from "./client";
 import { tokenStorage } from "../auth/tokenStorage";
 
 export async function login(username: string, password: string) {
-  const resp = await api.post("/api/token/", {
+  const resp = await api.post("/api/auth/login/", {
     username,
     password,
   });
