@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 # Create your models here.
 
@@ -17,6 +18,7 @@ class Profile(models.Model):
     account_type = models.CharField(max_length=2, choices=ACCOUNT_TYPES, default=ACCOUNT_APPLICANT)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, blank=True, null=True)
+    token_invalid_before = models.DateTimeField(default=timezone.make_aware(timezone.datetime.min))
 
     def clean(self):
         super().clean()

@@ -13,6 +13,8 @@ from .serializers import (JobPostingSerializer, ApplicationSerializer, Interview
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
+from django.utils import timezone
 
 # Create your views here.
 
@@ -30,13 +32,28 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response(
+                {"detail": "Missing 'refresh' in request body."},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            refresh_token = request.data["refresh"]
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response(status=http_status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            return Response(status=http_status.HTTP_400_BAD_REQUEST)
+        except TokenError as e:
+            return Response(
+                {"detail": f"Refresh token error: {str(e)}"},
+                status=http_status.HTTP_400_BAD_REQUEST
+            )
+
+        # Immediately invalidate existing access tokens for this user
+        profile = request.user.profile
+        profile.token_invalid_before = timezone.now()
+        profile.save(update_fields=["token_invalid_before"])
+
+        return Response(status=http_status.HTTP_205_RESET_CONTENT)
 
 class JobPostingViewSet(viewsets.ModelViewSet):
     queryset = JobPosting.objects.all()
