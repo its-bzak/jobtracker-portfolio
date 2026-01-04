@@ -52,6 +52,13 @@ build/
 .vite/
 
 ############################
+# Frontend
+############################
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+############################
 # Testing / Coverage
 ############################
 htmlcov/
