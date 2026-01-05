@@ -16,8 +16,16 @@ export async function login(username: string, password: string) {
   tokenStorage.setRefresh(refresh);
 }
 
-export function logout() {
-  tokenStorage.clear();
+export async function logout() {
+  const refresh = tokenStorage.getRefresh();
+
+  try {
+    if (refresh) {
+      await api.post("/api/auth/logout/", { refresh });
+    }
+  } finally {
+    tokenStorage.clear();
+  }
 }
 
 export function isLoggedIn(): boolean {
