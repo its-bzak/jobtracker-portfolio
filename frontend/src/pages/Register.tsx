@@ -14,11 +14,15 @@ export default function Register() {
     nav("/login");
   }
     return (
-    <form onSubmit={handleSubmit}>
-      <input placeholder="username" onChange={(e) => setUsername(e.target.value)} />
-      <input placeholder="email" onChange={(e) => setEmail(e.target.value)} />
-      <input placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit">Register</button>
-    </form>
+      <div id="register-container">
+        <form onSubmit={handleSubmit}>
+          <input placeholder="username" onChange={(e) => setUsername(e.target.value)} />
+          <input placeholder="email" onChange={(e) => setEmail(e.target.value)} />
+          <input placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
+            <button type="submit">Register</button>
+            <br />
+            <button type="button" onClick={() => nav("/login")}>Already have an account?</button>
+        </form>
+      </div>
     );
 }

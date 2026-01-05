@@ -14,10 +14,14 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input placeholder="username" onChange={(e) => setUsername(e.target.value)} />
-      <input placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
-      <button type="submit">Login</button>
-    </form>
+    <div id="login-container">
+      <form onSubmit={handleSubmit}>
+        <input placeholder="username" onChange={(e) => setUsername(e.target.value)} />
+        <input placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />
+        <button type="submit">Login</button>
+        <br />
+        <button type="button" onClick={() => nav("/register")}>Register</button>
+      </form>
+    </div>
   );
 }

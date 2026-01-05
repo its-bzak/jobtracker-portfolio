@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: hsl(0, 0%, 75%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -65,4 +65,65 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+}
+
+#login-container {
+  display: flex;
+  flex-direction: column;
+  background-color: hsl(0, 0%, 85%);
+  box-shadow: #1a1a1a33 0px 10px 50px;
+  border-radius: 10px;
+  width: 50%;
+  height: 50%;
+  align-items: center;
+  justify-content: center;
+}
+
+#login-container input {
+  width: 75%;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+#login-container button {
+  margin-top: 20px;
+  width: 50%;
+}
+
+#register-container {
+  display: flex;
+  flex-direction: column;
+  background-color: hsl(0, 0%, 85%);
+  box-shadow: #1a1a1a33 0px 10px 50px;
+  border-radius: 10px;
+  width: 50%;
+  height: 50%;
+  align-items: center;
+  justify-content: center;
+}
+
+#register-container input {
+  width: 75%;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+#register-container button {
+  margin-top: 20px;
+  width: 50%;
 }
