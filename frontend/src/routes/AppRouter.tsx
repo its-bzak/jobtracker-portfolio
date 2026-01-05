@@ -4,6 +4,10 @@ import JobBoard from "../pages/JobBoard";
 import RequireAuth from "../auth/RequireAuth";
 import Register from "../pages/Register";
 import Logout from "../pages/Logout";
+import Applications from "../pages/ApplicationsPage";
+import Profile from "../pages/ProfilePage";
+import Messages from "../pages/MessageBoard";
+import AppLayout from "../layouts/AppLayout";
 
 export default function AppRouter() {
   return (
@@ -13,8 +17,13 @@ export default function AppRouter() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route element={<RequireAuth />}> {/* Protected routes */ }
+        <Route element={<AppLayout />}>
           <Route path="/jobs" element={<JobBoard />} />
           <Route path="/logout" element={<Logout/>} />
+          <Route path="/applications" element={<Applications />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/messages" element={<Messages />} />
+        </Route>
         </Route>
       </Routes>
     </BrowserRouter>
