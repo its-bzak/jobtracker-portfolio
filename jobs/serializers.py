@@ -162,3 +162,11 @@ class JobAppAnswerSerializer(serializers.ModelSerializer):
         
         return data
     
+# Serializer for the authenticated user's own data
+class MeSerializer(serializers.ModelSerializer):
+    account_type = serializers.CharField(source="profile.account_type", read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "account_type"]
+        read_only_fields = ["id", "username", "email", "account_type"]
