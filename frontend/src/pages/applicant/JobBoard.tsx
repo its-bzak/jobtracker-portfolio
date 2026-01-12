@@ -89,7 +89,7 @@ export default function JobBoard() {
               <p className={styles.company}>
                 {typeof job.company === 'object' ? job.company.name : `Company ID: ${job.company}`}
               </p>
-              <p className={styles.location}>📍 {job.location}</p>
+              <p className={styles.location}>{job.location}</p>
             </div>
 
             {job.salary_range && (
@@ -104,10 +104,10 @@ export default function JobBoard() {
               <span className={styles.postedDate}>Posted: {formatDate(job.posted_date)}</span>
               <span className={styles.employmentMeans}>
                 {job.employment_means === 'RE'
-                  ? '🌐 Remote'
+                  ? 'Remote'
                   : job.employment_means === 'ON'
-                    ? '🏢 On-site'
-                    : '🤝 Hybrid'}
+                    ? 'On-site'
+                    : 'Hybrid'}
               </span>
             </div>
 
