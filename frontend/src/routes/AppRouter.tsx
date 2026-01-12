@@ -9,6 +9,7 @@ import AppLayout from "../layouts/AppLayout";
 import RequireAuth from "../auth/RequireAuth";
 // Applicant pages
 import ApplicantJobs from "../pages/applicant/JobBoard";
+import JobDetail from "../pages/applicant/JobDetail";
 import ApplicantApplications from "../pages/applicant/ApplicationsPage";
 import ApplicationEdit from "../pages/applicant/ApplicationEdit";
 import ApplicantProfile from "../pages/applicant/ProfilePage";
@@ -40,6 +41,7 @@ export default function AppRouter() {
             {/* applicant group */}
             <Route element={<RequireRole role="AP" />}>
               <Route path="/applicant/jobs" element={<ApplicantJobs />} />
+              <Route path="/applicant/jobs/:id" element={<JobDetail />} />
               <Route path="/applicant/applications" element={<ApplicantApplications />} />
               <Route path="/applicant/applications/:id/edit" element={<ApplicationEdit />} />
               <Route path="/applicant/messages" element={<ApplicantMessages />} />

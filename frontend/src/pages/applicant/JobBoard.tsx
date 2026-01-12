@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getJobPostings, applyToJob } from '../../api/jobs';
 import type { JobPosting } from "../../api/jobs";
 import { Card } from '../../components/ui/Card';
@@ -10,6 +11,7 @@ export default function JobBoard() {
   const [jobs, setJobs] = useState<JobPosting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -115,7 +117,7 @@ export default function JobBoard() {
               <Button variant="primary" onClick={() => handleApply(job.id)}>
                 Apply
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => navigate(`/applicant/jobs/${job.id}`)}>
                 View Details
               </Button>
             </div>
