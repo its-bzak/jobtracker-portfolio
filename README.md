@@ -1,24 +1,13 @@
-# Job Tracker Application
+Portfolio-Scoped version of https://github.com/its-bzak/jobtracker
 
-***What?*** - This application is an all-in-one job search tool and application handler. Companies and Employers will have the ability to 
-post job listings, where candidates will then be able to apply on that very same application. Applications submitted by candidates will be sent
-to the company, where they will be subject to review before being sent back to the candidate with a status update reflecting the decision of the employer.
+This repository is intended to showcase my experience and understanding of core full-stack development concepts through a deliberately scoped, single-developer project.
 
-***Why?*** - As a current college student, the process of applying for various internships and jobs has really highlighted to me how much the current process
-could be improved upon. For example, the current application process involves creating a new login for each of the companies you apply to, keeping track of a
-plethora of emails, etc. The goal of my application is to create a simpler, more streamlined process for both the job candidate, as well as the company.
-
-
-***How?*** - 
-The tech stack for this project is as follows:
-
-|  Area  |Tech Used|
-|--------|---------|
-|Frontend|React + Vite|
-|Backend |Django REST Framework|
-| Auth.  | JWT |
-|Deployment| TBD |
-
-The Django REST Framework will allow me to create various API endpoints that will allow applications to be created, read, updated and deleted. Additionally,
-leveraging relationships such as one-to-one, one-to-many, and many-to-many will allow me to create a smooth, effective application to be used by the
-public.
+Skills used in this particular project include (but are not limited to):
+- JWT based authentication and role-based authentication
+- CRUD operations across relational data models
+- RESTful API design and handling of requests
+- Server-side validation and error handling
+- Communication between client and server using HTTP
+- Conditional rendering for frontend
+- Filtering and querying data
+- Version control and iterative development using Git
