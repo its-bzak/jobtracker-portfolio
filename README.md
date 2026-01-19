@@ -1,6 +1,6 @@
 Portfolio-Scoped version of https://github.com/its-bzak/jobtracker
 
-This repository is meant to display my experience and knowledge of various full-stack concepts and practices.
+This repository is intended to showcase my experience and understanding of core full-stack development concepts through a deliberately scoped, single-developer project.
 
 Skills used in this particular project include (but are not limited to):
 - JWT based authentication and role-based authentication
