@@ -120,7 +120,7 @@ export default function ApplicantApplications() {
                 <div className={styles.row}>
                   <div>
                     <h2 className={styles.jobTitle}>{job ? job.title : `Job #${typeof app.job === 'number' ? app.job : app.job.id}`}</h2>
-                    <p className={styles.companyName}>{job && typeof job.company === 'object' ? job.company.name : typeof job.company === 'number' ? `Company #${job.company}` : ''}</p>
+                    <p className={styles.companyName}>{job && typeof job.company === 'object' ? job.company.name : job && typeof job.company === 'number' ? `Company #${job.company}` : ''}</p>
                   </div>
                   <div className={styles.meta}>
                     <div className={`${styles.statusBadge} ${styles[`status-${app.status.toLowerCase()}`]}`}>{statusLabel[app.status] ?? app.status}</div>
