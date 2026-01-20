@@ -13,12 +13,10 @@ import JobDetail from "../pages/applicant/JobDetail";
 import ApplicantApplications from "../pages/applicant/ApplicationsPage";
 import ApplicationEdit from "../pages/applicant/ApplicationEdit";
 import ApplicantProfile from "../pages/applicant/ProfilePage";
-import ApplicantMessages from "../pages/applicant/MessageBoard";
 // Employer pages
 import EmployerJobPostings from "../pages/employer/JobPostings";
 import EmployerApplications from "../pages/employer/ApplicantsPage";
 import EmployerProfile from "../pages/employer/ProfilePage";
-import EmployerMessages from "../pages/employer/MessageBoard";
 
 import RoleHomeRedirect from "../auth/RoleHomeRedirect";
 
@@ -44,7 +42,6 @@ export default function AppRouter() {
               <Route path="/applicant/jobs/:id" element={<JobDetail />} />
               <Route path="/applicant/applications" element={<ApplicantApplications />} />
               <Route path="/applicant/applications/:id/edit" element={<ApplicationEdit />} />
-              <Route path="/applicant/messages" element={<ApplicantMessages />} />
               <Route path="/applicant/profile" element={<ApplicantProfile />} />
             </Route>
 
@@ -52,7 +49,6 @@ export default function AppRouter() {
             <Route element={<RequireRole role="EM" />}>
               <Route path="/employer/jobs" element={<EmployerJobPostings />} />
               <Route path="/employer/applications" element={<EmployerApplications />} />
-              <Route path="/employer/messages" element={<EmployerMessages />} />
               <Route path="/employer/profile" element={<EmployerProfile />} />
             </Route>
 
