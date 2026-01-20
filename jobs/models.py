@@ -75,8 +75,6 @@ class JobPosting(models.Model):
 class Application(models.Model):
     applicant = models.ForeignKey(User, on_delete=models.CASCADE) # Each application is linked to a profile
     job = models.ForeignKey(JobPosting, on_delete=models.CASCADE) # Each application is linked to a job posting
-    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
-    cover_letter = models.FileField(upload_to='cover-letters/', blank=True, null=True)
     notes = models.TextField(max_length=1000, blank=True, null=True, help_text="Additional notes for the employer")
     application_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=[
@@ -121,50 +119,3 @@ class Interview(models.Model):
 
     def __str__(self):
         return f"Interview for {self.application.job.title} with {self.interviewer_name} on {self.interview_date}"
-    
-
-class JobAppQuestion(models.Model):
-    SHORT_TEXT = 'Short Answer'
-    LONG_TEXT = 'Long Answer'
-    NUMBER = 'Number'
-    DATE = 'Date'
-    YES_NO = 'Yes/No'
-    CHOICES = 'Choices'
-    job = models.ForeignKey(JobPosting, on_delete=models.CASCADE, related_name="questions") # Each question is linked to a job posting
-    question_prompt = models.CharField(max_length=255)
-    answer_type = models.CharField(max_length=20, choices=[
-        (SHORT_TEXT, 'Short Answer'),
-        (LONG_TEXT, 'Long Answer'),
-        (NUMBER, 'Number'),
-        (DATE, 'Date'),
-        (YES_NO, 'Yes/No'),
-        (CHOICES, 'Choices')
-    ], default=LONG_TEXT)
-    required = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.question_prompt} - {self.answer_type}"
-        
-class JobAppAnswer(models.Model):
-    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="answers") # Each answer is linked to an application
-    question = models.ForeignKey(JobAppQuestion, on_delete=models.CASCADE) # Each answer is linked to a question
-
-    answer_value = models.TextField(blank=True, null=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['application', 'question'], name='unique_answer_per_question')
-        ]
-    
-    def clean(self):
-        super().clean()
-
-        if self.application_id and self.question_id:
-            if self.application.job_id != self.question.job_id:
-                raise ValidationError({
-                    "question": "This cannot answer a question that is not for this job."
-                })
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        return super().save(*args, **kwargs)

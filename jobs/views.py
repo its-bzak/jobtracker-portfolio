@@ -7,9 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
-from .models import Profile, JobPosting, Application, Interview, JobAppQuestion, JobAppAnswer
-from .serializers import (JobPostingSerializer, ApplicationSerializer, InterviewSerializer, 
-                          JobAppAnswerSerializer, JobAppQuestionSerializer, RegisterSerializer, MeSerializer)
+from .models import Profile, JobPosting, Application, Interview
+from .serializers import (JobPostingSerializer, ApplicationSerializer, InterviewSerializer, RegisterSerializer, MeSerializer)
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -95,26 +94,11 @@ class JobPostingViewSet(viewsets.ModelViewSet):
             defaults={"status": Application.DR},
         )
 
-        # Ensure answers exist for every question
-        for q in job.questions.all():
-            JobAppAnswer.objects.get_or_create(application=application, question=q)
-
         # Build response
         app_data = ApplicationSerializer(application, context={"request": request}).data
 
-        answers = JobAppAnswer.objects.filter(application=application).select_related("question")
-        answer_by_qid = {a.question_id: a for a in answers}
-
-        questions_payload = []
-        for q in job.questions.all():
-            ans = answer_by_qid.get(q.id)
-            questions_payload.append({
-                "question": JobAppQuestionSerializer(q, context={"request": request}).data,
-                "answer": JobAppAnswerSerializer(ans, context={"request": request}).data if ans else None,
-            })
-
         return Response(
-            {"application": app_data, "questions": questions_payload},
+            {"application": app_data},
             status=http_status.HTTP_201_CREATED if created else http_status.HTTP_200_OK
         )
 
@@ -131,9 +115,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         application = serializer.save(applicant=self.request.user)
-        # Populate answers for all questions of the job on creation
-        for q in application.job.questions.all():
-            JobAppAnswer.objects.get_or_create(application=application, question=q)
 
     def perform_update(self, serializer):
         application = self.get_object()
@@ -163,22 +144,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 status=http_status.HTTP_400_BAD_REQUEST
             )
 
-        # To Do: Add any additional submission logic here (e.g., send notification, etc.)
-
-        # Validate required questions have answers
-        required_questions = application.job.questions.filter(required=True)
-        missing_questions = []
-        for q in required_questions:
-            ans = application.answers.filter(question=q).first()
-            if not ans or not ans.answer_value or not ans.answer_value.strip():
-                missing_questions.append({"id": q.id, "prompt": q.question_prompt})
-
-        if missing_questions:
-            return Response({"detail": "Missing required questions.", "missing_questions": missing_questions}, status=http_status.HTTP_400_BAD_REQUEST)
-
-        # Validate required application-level fields (resume required)
-        if not application.resume:
-            return Response({"detail": "Resume is required to submit an application."}, status=http_status.HTTP_400_BAD_REQUEST)
 
         # Transition status to Applied using transition method to validate allowed transitions
         try:
@@ -311,70 +276,6 @@ class InterviewViewSet(viewsets.ModelViewSet):
             return Response({"detail": e.messages}, status=http_status.HTTP_400_BAD_REQUEST)
         return Response({"id": app.id, "status": app.status})
 
-class JobAppQuestionViewSet(viewsets.ModelViewSet):
-    queryset = JobAppQuestion.objects.all()
-    serializer_class = JobAppQuestionSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        if self.request.user.profile.account_type == Profile.ACCOUNT_EMPLOYER:
-            return JobAppQuestion.objects.filter(job__company=self.request.user.profile.company)
-        return JobAppQuestion.objects.none()  # Applicants cannot view questions directly
-
-    def perform_create(self, serializer):
-        job = serializer.validated_data["job"]
-        if job.company != self.request.user.profile.company or self.request.user.profile.company is None:
-            raise PermissionDenied("You do not have permission to add questions to this job posting.")
-        serializer.save()
-
-    def perform_update(self, serializer):
-        question = self.get_object()
-        if question.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
-            raise PermissionDenied("You do not have permission to update this question.")
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.job.company != self.request.user.profile.company or self.request.user.profile.company is None:
-            raise PermissionDenied("You do not have permission to delete this question.")
-        instance.delete()
-
-
-class JobAppAnswerViewSet(viewsets.ModelViewSet):
-    serializer_class = JobAppAnswerSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return JobAppAnswer.objects.filter(application__applicant=self.request.user)
-
-    def perform_create(self, serializer):
-        application = serializer.validated_data["application"]
-        question = serializer.validated_data["question"]
-
-        if application.applicant != self.request.user:
-            raise PermissionDenied("You do not have permission to answer questions for this application.")
-
-        if question.job != application.job:
-            raise ValidationError("This question does not belong to the job posting for this application.")
-        
-        if application.status != Application.DR:
-            raise PermissionDenied("You can only answer questions for draft applications.")
-
-        serializer.save()
-
-    def perform_update(self, serializer):
-        answer = self.get_object()
-        if answer.application.applicant != self.request.user:
-            raise PermissionDenied("You do not have permission to update this answer.")
-        if answer.application.status != Application.DR:
-            raise PermissionDenied("You can only update answers for draft applications.")
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.application.applicant != self.request.user:
-            raise PermissionDenied("You do not have permission to delete this answer.")
-        if instance.application.status != Application.DR:
-            raise PermissionDenied("You can only delete answers for draft applications.")
-        instance.delete()
 
 class MeView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
