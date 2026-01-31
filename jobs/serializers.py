@@ -1,8 +1,18 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Interview, JobPosting, Application, Profile
+from .models import Interview, JobPosting, Application, Profile, Company
 
 User = get_user_model()
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['id', 'name']
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -34,6 +44,7 @@ class RegisterSerializer(serializers.Serializer):
         return user
 
 class JobPostingSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)
 
     class Meta:
         model = JobPosting
@@ -41,6 +52,8 @@ class JobPostingSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "company", "posted_date"]
         
 class ApplicationSerializer(serializers.ModelSerializer):
+    applicant = UserSerializer(read_only=True)
+    job = JobPostingSerializer(read_only=True)
 
     class Meta:
         model = Application

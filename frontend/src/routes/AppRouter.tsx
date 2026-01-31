@@ -12,11 +12,9 @@ import ApplicantJobs from "../pages/applicant/JobBoard";
 import JobDetail from "../pages/applicant/JobDetail";
 import ApplicantApplications from "../pages/applicant/ApplicationsPage";
 import ApplicationEdit from "../pages/applicant/ApplicationEdit";
-import ApplicantProfile from "../pages/applicant/ProfilePage";
 // Employer pages
 import EmployerJobPostings from "../pages/employer/JobPostings";
 import EmployerApplications from "../pages/employer/ApplicantsPage";
-import EmployerProfile from "../pages/employer/ProfilePage";
 
 import RoleHomeRedirect from "../auth/RoleHomeRedirect";
 
@@ -42,14 +40,12 @@ export default function AppRouter() {
               <Route path="/applicant/jobs/:id" element={<JobDetail />} />
               <Route path="/applicant/applications" element={<ApplicantApplications />} />
               <Route path="/applicant/applications/:id/edit" element={<ApplicationEdit />} />
-              <Route path="/applicant/profile" element={<ApplicantProfile />} />
             </Route>
 
             {/* employer group */}
             <Route element={<RequireRole role="EM" />}>
               <Route path="/employer/jobs" element={<EmployerJobPostings />} />
               <Route path="/employer/applications" element={<EmployerApplications />} />
-              <Route path="/employer/profile" element={<EmployerProfile />} />
             </Route>
 
             {/* catch-all */}

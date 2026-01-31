@@ -10,13 +10,11 @@ type NavItem = { to: string; label: string };
 const applicantItems: NavItem[] = [
   { to: "/applicant/jobs", label: "Jobs" },
   { to: "/applicant/applications", label: "My Applications" },
-  { to: "/applicant/profile", label: "Profile" },
 ];
 // Employer nav items
 const employerItems: NavItem[] = [
   { to: "/employer/jobs", label: "Job Postings" },
   { to: "/employer/applications", label: "Candidates" },
-  { to: "/employer/profile", label: "Profile" },
 ];
 
 export default function TopNav() {
