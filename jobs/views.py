@@ -59,6 +59,14 @@ class JobPostingViewSet(viewsets.ModelViewSet):
     serializer_class = JobPostingSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        profile = self.request.user.profile
+        if profile.account_type == Profile.ACCOUNT_EMPLOYER and profile.company is not None:
+            # Employers only see their company's job postings
+            return JobPosting.objects.filter(company=profile.company)
+        # Applicants and others see all job postings
+        return JobPosting.objects.all()
+
     def perform_create(self, serializer):
         profile = self.request.user.profile
         if profile.account_type != Profile.ACCOUNT_EMPLOYER or profile.company is None:

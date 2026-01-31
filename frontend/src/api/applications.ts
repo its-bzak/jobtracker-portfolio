@@ -39,3 +39,17 @@ export const withdrawApplication = async (id: number): Promise<{ id: number; sta
   const response = await api.post(`/api/applications/${id}/withdraw/`);
   return response.data;
 };
+export const promoteToInterview = async (id: number): Promise<{ id: number; status: ApplicationStatus }> => {
+  const response = await api.post(`/api/applications/${id}/promote_to_interview/`);
+  return response.data;
+};
+
+export const offerApplication = async (id: number): Promise<{ id: number; status: ApplicationStatus }> => {
+  const response = await api.post(`/api/applications/${id}/offer/`);
+  return response.data;
+};
+
+export const rejectApplication = async (id: number): Promise<{ id: number; status: ApplicationStatus }> => {
+  const response = await api.post(`/api/applications/${id}/reject/`);
+  return response.data;
+};
