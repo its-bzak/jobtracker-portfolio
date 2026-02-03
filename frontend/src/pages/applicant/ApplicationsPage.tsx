@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '../../auth/AuthContext';
 import { getJobPostings } from '../../api/jobs';
 import type { JobPosting } from '../../api/jobs';
 import type { Application } from '../../api/applications';
@@ -22,6 +23,7 @@ export default function ApplicantApplications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { markNewApplicationDraft } = useAuth();
 
   const fetchData = useCallback(async () => {
     try {
@@ -39,6 +41,8 @@ export default function ApplicantApplications() {
 
   useEffect(() => {
     fetchData();
+    // clear the new-draft indicator when viewing applications
+    markNewApplicationDraft?.(false);
   }, [fetchData]);
 
   const formatDate = (dateString?: string | null) => {

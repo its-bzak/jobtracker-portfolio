@@ -9,6 +9,8 @@ type AuthState = {
   loading: boolean;
   refreshMe: () => Promise<Me>;
   clearMe: () => void;
+  hasNewApplicationDraft: boolean;
+  markNewApplicationDraft: (v: boolean) => void;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -17,6 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [me, setMe] = useState<Me | null>(null);
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasNewApplicationDraft, setHasNewApplicationDraft] = useState(false);
 
   async function refreshMe(): Promise<Me> {
     const data = await getMe();
@@ -28,6 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function clearMe() {
     setMe(null);
     setAccountType(null);
+  }
+
+  function markNewApplicationDraft(v: boolean) {
+    setHasNewApplicationDraft(v);
   }
 
   useEffect(() => {
@@ -48,8 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ me, accountType, loading, refreshMe, clearMe }),
-    [me, accountType, loading]
+    () => ({ me, accountType, loading, refreshMe, clearMe, hasNewApplicationDraft, markNewApplicationDraft }),
+    [me, accountType, loading, hasNewApplicationDraft]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

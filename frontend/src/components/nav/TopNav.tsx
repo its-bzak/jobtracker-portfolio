@@ -18,7 +18,7 @@ const employerItems: NavItem[] = [
 ];
 
 export default function TopNav() {
-  const { accountType, loading } = useAuth();
+  const { accountType, loading, hasNewApplicationDraft } = useAuth();
 
   const items =
     accountType === "EM" ? employerItems : applicantItems;
@@ -37,7 +37,10 @@ export default function TopNav() {
                 isActive ? styles.activeLink : styles.link
               }
             >
-              {item.label}
+              <span>{item.label}</span>
+              {item.to === '/applicant/applications' && hasNewApplicationDraft && (
+                <span className={styles.dot} aria-hidden />
+              )}
             </NavLink>
           ))}
       </div>

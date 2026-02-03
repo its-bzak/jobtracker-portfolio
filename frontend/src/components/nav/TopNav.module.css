@@ -55,6 +55,15 @@
   align-items: center;
 }
 
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #ef4444; /* red */
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
 .logout {
   font-size: 14px;
   font-weight: 500;

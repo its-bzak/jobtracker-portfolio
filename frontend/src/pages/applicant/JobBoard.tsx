@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getJobPostings, applyToJob } from '../../api/jobs';
 import type { JobPosting } from "../../api/jobs";
+import { useAuth } from '../../auth/AuthContext';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -13,6 +14,7 @@ export default function JobBoard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { markNewApplicationDraft } = useAuth();
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -34,9 +36,20 @@ export default function JobBoard() {
   const handleApply = async (jobId: number) => {
     try {
       await applyToJob(jobId);
-      alert('Application submitted successfully!');
+      // mark that a new draft exists so the nav can show a notification dot
+      markNewApplicationDraft?.(true);
+      alert('Application draft created! View it in the applications page.');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to apply to job');
+      const e: any = err;
+      if (e?.response?.status === 409) {
+        alert("You've already applied to this job");
+        return;
+      }
+      if (e?.response?.data?.detail) {
+        alert(e.response.data.detail);
+      } else {
+        alert(err instanceof Error ? err.message : 'Failed to apply to job');
+      }
     }
   };
 
