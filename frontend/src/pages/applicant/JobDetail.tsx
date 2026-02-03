@@ -80,7 +80,7 @@ export default function JobDetail() {
         </div>
 
         <div className={styles.description}>
-          <h3>Description</h3>
+          <h3>Description: </h3>
           <p>{job.description}</p>
         </div>
 

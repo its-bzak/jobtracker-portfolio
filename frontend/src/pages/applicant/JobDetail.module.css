@@ -14,6 +14,29 @@
   align-items: center;
 }
 
+.container h1 {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #1f2937;
+}
+
+.company {
+  display: flex;
+  align-self: flex-start;
+}
+
+p {
+  color: #1f2937;
+}
+
+h2 {
+  color: #1f2937;
+}
+
+h3 {
+  color: #1f2937;
+}
+
 .title {
   margin: 0;
   font-size: 1.25rem;

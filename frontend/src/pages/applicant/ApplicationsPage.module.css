@@ -40,9 +40,11 @@
 }
 
 .companyName {
+  display: flex;
   margin: 0.25rem 0 0 0;
   color: #6b7280;
   font-size: 0.95rem;
+  align-self: flex-start;
 }
 
 .meta {
@@ -69,7 +71,7 @@
 .status-ap { background-color: #047857; } /* Applied - green */
 .status-in { background-color: #0ea5e9; } /* Interview - blue */
 .status-re { background-color: #dc2626; } /* Rejected - red */
-.status-of { background-color: #b45309; } /* Offered - amber */
+.status-of { background-color: #e1d419; } /* Offered - yellow */
 
 .actions {
   display: flex;
