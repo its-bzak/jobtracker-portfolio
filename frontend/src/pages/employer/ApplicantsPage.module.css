@@ -140,6 +140,9 @@
   display: flex;
   gap: 1rem;
 }
+.applicationDate {
+  color: #111827;
+}
 
 .label {
   font-weight: 500;

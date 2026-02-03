@@ -191,8 +191,8 @@ export default function EmployerApplications() {
 
                     <div className={styles.details}>
                       <div className={styles.detailRow}>
-                        <span className={styles.label}>Applied:</span>
-                        <span>{formatDate(app.application_date)}</span>
+                        <span className={styles.label}>Date Received:</span>
+                        <span className={styles.applicationDate}>{formatDate(app.application_date)}</span>
                       </div>
                       {app.notes && (
                         <div className={styles.detailRow}>
