@@ -5,6 +5,7 @@ import type { JobPosting } from '../../api/jobs';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
+import { formatSalary } from '../../utils/salary';
 import styles from './JobDetail.module.css';
 
 export default function JobDetail() {
@@ -75,7 +76,7 @@ export default function JobDetail() {
           <div><strong>Location:</strong> {job.location}</div>
           <div><strong>Posted:</strong> {formatDate(job.posted_date)}</div>
           <div><strong>Employment:</strong> {job.employment_means === 'RE' ? 'Remote' : job.employment_means === 'ON' ? 'On-site' : 'Hybrid'}</div>
-          {job.salary_range && <div><strong>Salary:</strong> {job.salary_range}</div>}
+          {job.salary_range && <div><strong>Salary:</strong> {formatSalary(job.salary_range, job.currency_code)}</div>}
         </div>
 
         <div className={styles.description}>

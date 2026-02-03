@@ -4,6 +4,7 @@ import type { JobPosting } from '../../api/jobs';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
+import { formatSalary } from '../../utils/salary';
 import styles from './JobPostings.module.css';
 
 export default function EmployerJobPostings() {
@@ -17,6 +18,7 @@ export default function EmployerJobPostings() {
     employment_means: 'ON' as 'RE' | 'ON' | 'HY',
     employment_type: 'FT' as 'FT' | 'PT' | 'CT' | 'IN',
     salary_range: '',
+    currency_code: 'USD',
     description: '',
   });
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -61,6 +63,7 @@ export default function EmployerJobPostings() {
         employment_means: 'ON',
         employment_type: 'FT',
         salary_range: '',
+        currency_code: 'USD',
         description: '',
       });
       setShowForm(false);
@@ -170,12 +173,34 @@ export default function EmployerJobPostings() {
                   name="salary_range"
                   value={formData.salary_range}
                   onChange={handleInputChange}
-                  placeholder="e.g., $120,000 - $160,000"
+                  placeholder="e.g., 120,000 - 160,000"
                 />
               </div>
             </div>
 
             <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="currency_code">Currency *</label>
+                <select
+                  id="currency_code"
+                  name="currency_code"
+                  value={formData.currency_code}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="USD">US Dollar (USD)</option>
+                  <option value="EUR">Euro (EUR)</option>
+                  <option value="GBP">British Pound (GBP)</option>
+                  <option value="CAD">Canadian Dollar (CAD)</option>
+                  <option value="AUD">Australian Dollar (AUD)</option>
+                  <option value="JPY">Japanese Yen (JPY)</option>
+                  <option value="CHF">Swiss Franc (CHF)</option>
+                  <option value="CNY">Chinese Yuan (CNY)</option>
+                  <option value="INR">Indian Rupee (INR)</option>
+                  <option value="MXN">Mexican Peso (MXN)</option>
+                </select>
+              </div>
+
               <div className={styles.formGroup}>
                 <label htmlFor="employment_type">Employment Type *</label>
                 <select
@@ -258,7 +283,7 @@ export default function EmployerJobPostings() {
                   <p className={styles.location}>{job.location}</p>
                   {job.salary_range && (
                     <p className={styles.salary}>
-                      <strong>Salary:</strong> {job.salary_range}
+                      <strong>Salary:</strong> {formatSalary(job.salary_range, job.currency_code)}
                     </p>
                   )}
                 </div>

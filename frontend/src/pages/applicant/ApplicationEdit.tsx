@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getApplication, updateApplication } from '../../api/applications';
+import { getApplication, updateApplication, submitApplication } from '../../api/applications';
 import type { Application } from '../../api/applications';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -46,14 +46,17 @@ export default function ApplicationEdit() {
 
   const handleSubmitApp = async () => {
     if (!application) return;
-    // submit latest state
     try {
-      await fetch('/api/applications/' + application.id + '/submit/', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      // Save any pending notes first
+      if (notes !== (application.notes ?? '')) {
+        await updateApplication(application.id, { notes });
+      }
+      // Then submit the application
+      await submitApplication(application.id);
       alert('Application submitted.');
       navigate('/applicant/applications');
     } catch (err) {
-      // Let fetch fallback to alert
-      alert('Failed to submit.');
+      alert(err instanceof Error ? err.message : 'Failed to submit.');
     }
   };
 

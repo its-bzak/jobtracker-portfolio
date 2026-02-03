@@ -5,6 +5,7 @@ import type { JobPosting } from "../../api/jobs";
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
+import { formatSalary } from '../../utils/salary';
 import styles from './JobBoard.module.css';
 
 export default function JobBoard() {
@@ -96,7 +97,7 @@ export default function JobBoard() {
 
             {job.salary_range && (
               <p className={styles.salary}>
-                <strong>Salary:</strong> {job.salary_range}
+                <strong>Salary:</strong> {formatSalary(job.salary_range, job.currency_code)}
               </p>
             )}
 

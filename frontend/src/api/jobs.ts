@@ -8,6 +8,7 @@ export interface JobPosting {
   employment_means: 'RE' | 'ON' | 'HY';
   employment_type: 'FT' | 'PT' | 'CT' | 'IN';
   salary_range: string | null;
+  currency_code: string;
   description: string;
   posted_date: string;
 }

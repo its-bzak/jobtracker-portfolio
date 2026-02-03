@@ -57,6 +57,18 @@ class JobPosting(models.Model):
         ('HY', 'Hybrid'),
     ], default='ON')
     salary_range = models.CharField(max_length=50, blank=True, null=True)
+    currency_code = models.CharField(max_length=3, choices=[
+        ('USD', 'US Dollar'),
+        ('EUR', 'Euro'),
+        ('GBP', 'British Pound'),
+        ('CAD', 'Canadian Dollar'),
+        ('AUD', 'Australian Dollar'),
+        ('JPY', 'Japanese Yen'),
+        ('CHF', 'Swiss Franc'),
+        ('CNY', 'Chinese Yuan'),
+        ('INR', 'Indian Rupee'),
+        ('MXN', 'Mexican Peso'),
+    ], default='USD')
     description = models.TextField(max_length=1000)
     posted_date = models.DateField(auto_now_add=True)
 
