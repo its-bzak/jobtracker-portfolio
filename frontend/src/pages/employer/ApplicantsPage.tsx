@@ -196,7 +196,7 @@ export default function EmployerApplications() {
                       </div>
                       {app.notes && (
                         <div className={styles.detailRow}>
-                          <span className={styles.label}>Notes:</span>
+                          <span className={styles.label}>Note:</span>
                           <span className={styles.notes}>{app.notes}</span>
                         </div>
                       )}
